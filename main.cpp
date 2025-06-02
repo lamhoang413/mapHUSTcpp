@@ -206,7 +206,20 @@ std::pair<std::vector<std::string>, int> Dijkstra(const Graph& graph, const std:
     
     return std::make_pair(path, dist[end]);
 }
+double Haversine(double lat1, double lon1, double lat2, double lon2) {
+    const double R = 6371e3; // bán kính Trái đất (m)
+    double φ1 = lat1 * M_PI / 180;
+    double φ2 = lat2 * M_PI / 180;
+    double Δφ = (lat2 - lat1) * M_PI / 180;
+    double Δλ = (lon2 - lon1) * M_PI / 180;
 
+    double a = std::sin(Δφ/2) * std::sin(Δφ/2) +
+               std::cos(φ1) * std::cos(φ2) *
+               std::sin(Δλ/2) * std::sin(Δλ/2);
+    double c = 2 * std::atan2(std::sqrt(a), std::sqrt(1-a));
+
+    return R * c; // khoảng cách (mét)
+}
 void updateOccupiedHandler(const httplib::Request& req, httplib::Response& res) {
     try {
         json j = json::parse(req.body);
@@ -229,20 +242,7 @@ void updateOccupiedHandler(const httplib::Request& req, httplib::Response& res) 
 }
 
 
-double Haversine(double lat1, double lon1, double lat2, double lon2) {
-    const double R = 6371e3; // bán kính Trái đất (m)
-    double φ1 = lat1 * M_PI / 180;
-    double φ2 = lat2 * M_PI / 180;
-    double Δφ = (lat2 - lat1) * M_PI / 180;
-    double Δλ = (lon2 - lon1) * M_PI / 180;
 
-    double a = std::sin(Δφ/2) * std::sin(Δφ/2) +
-               std::cos(φ1) * std::cos(φ2) *
-               std::sin(Δλ/2) * std::sin(Δλ/2);
-    double c = 2 * std::atan2(std::sqrt(a), std::sqrt(1-a));
-
-    return R * c; // khoảng cách (mét)
-}
 
 std::pair<std::string, double> FindNearestPoint(const Location& current) {
     double minDist = std::numeric_limits<double>::max();
